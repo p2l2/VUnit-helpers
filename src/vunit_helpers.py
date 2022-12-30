@@ -116,8 +116,8 @@ def add_precompiled_uvvm_libraries(VU, used_libraries, UVVM_root_path):
             VU.add_external_library(libname, location)
             logger.debug(f"adding library {libname} from {str(location)}")
     elif VU.get_simulator_name() == "ghdl":
-        for libname in uvvm_libraries:
-            location = uvvm_root_path / libname / "v08"
+        for libname in used_libraries:
+            location = UVVM_root_path / libname / "v08"
             VU.add_external_library(libname, location)
             logger.debug(f"adding library {libname} from {str(location)}")
     else:
