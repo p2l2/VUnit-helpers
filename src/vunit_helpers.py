@@ -7,6 +7,7 @@
 import sys
 from pathlib import Path
 import subprocess
+from subprocess import call, STDOUT
 import os
 from os.path import dirname
 import logging
@@ -25,14 +26,23 @@ def enable_debug_logging():
     logger.setLevel(logging.DEBUG)
 
 
+
 def get_git_repo_root_path():
     """
     Returns the absolute path to the git repository root
+    Returns None if the current directory is not within a git repository
 
+    Args:
+        path: 
     """
-    # get the git repository path
-    git_repo_dir = subprocess.Popen(
-        ['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE).communicate()[0].rstrip().decode("utf-8")
+    if call(["git", "branch"], stderr=STDOUT, stdout=open(os.devnull, 'w')) != 0:
+        return None
+        logger.warning(f"This is not a git repository!")
+
+    else:
+        git_repo_dir = subprocess.Popen(
+        ['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE).communicate()[0].rstrip().decode("utf-8") 
+        logger.debug(f"git repo path: {str(git_repo_dir)}")
     return Path(git_repo_dir)
 
 
