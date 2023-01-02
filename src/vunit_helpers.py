@@ -177,7 +177,8 @@ class File_pattern:
             self.exclude_simulators = when_simulator_is_not
 
 
-def advanced_add_source_files(VU, lib, include_patterns: list[File_pattern], exclude_patterns: list[File_pattern] = None,
+def advanced_add_source_files(VU, lib, include_patterns, 
+                              exclude_patterns=None,
                               preprocessors=None,
                               include_dirs=None,
                               defines=None,
