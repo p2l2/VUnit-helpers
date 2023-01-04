@@ -46,7 +46,7 @@ def get_git_repo_root_path():
     return Path(git_repo_dir)
 
 
-def generate_rust_hdl_toml(VU, output_file):
+def generate_rust_hdl_toml(VU, output_file, file_root_path):
     """
     Generate the toml file required by rust_hdl (vhdl_ls).
 
@@ -57,6 +57,7 @@ def generate_rust_hdl_toml(VU, output_file):
     Args:
         VU: A VUnit object file.
         output_file: A string containing the path to the output file.
+        file_root_path: root path for relative filenames. The path is used to convert them to absolute paths
     """
 
     # TODO: check if precompiled libraries were added
@@ -64,10 +65,17 @@ def generate_rust_hdl_toml(VU, output_file):
     libs = VU.get_libraries()
     vhdl_ls = {"libraries": {}}
     for lib in libs:
+        files = []
+        for file in lib.get_source_files(allow_empty=True):
+            if os.path.isabs(file.name):
+                files.append(str(file.name))
+            else:
+                files.append(str(Path(file_root_path) / file.name))
+
         vhdl_ls["libraries"].update(
             {
                 lib.name: {
-                    "files": [f"verification/{file.name}" for file in lib.get_source_files(allow_empty=True)]
+                    "files": files
                 }
             }
         )
