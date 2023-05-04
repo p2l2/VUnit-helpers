@@ -84,23 +84,56 @@ def generate_rust_hdl_toml(VU, output_file, file_root_path):
     logger.debug(f"rust_hdl configuration was written to {output_file}")
 
 
-def add_uvvm_sources(VU, used_libraries, UVVM_root_path):
-    """ 
-    Add the passed UVVM libraries as source files to VUnit. 
+def add_uvvm_sources(VU,uvvm_path,libraries=None):
+    """
+    UVVM https://github.com/UVVM/UVVM is a free and Open Source Methodology and Library which can be used in combination with VUnit.
+    Use add_uvvm to add the UVVM sources from a given path. 
+    Since UVVM is not included in VUnit, it must be cloned separately. 
 
-    VUnit will handle analyze the compile order. This way, no precompilation of UVVM is needed.
-    Args:
-        VU: A VUnit object file.
-        used_libraries: A list of uvvm libraries. E.g. ['uvvm_util','uvvm_vvc_framework','bitvis_vip_scoreboard','bitvis_vip_clock_generator']
-        UVVM_root_path: root path pointing to the UVVM directory. E.g. get_git_repo_root_path() / "verification" / "uvvm"
+    Usage examples: 
+    VU.add_uvvm(uvvm_path="../UVVM") # To add all UVVM libraries
+
+    To decrease the compile duration, you can specify the libraries needed for simulation. 
+    The following example would compile  uvvm_util, uvvm_vvc_framework and bitvis_vip_clock_generator only:
+    VU.add_uvvm(uvvm_path="../UVVM", libraries=['uvvm_util', 'uvvm_vvc_framework','bitvis_vip_clock_generator'])
+
+    UVVM provides txt files with compile information. There is one txt file that lists all libraries of UVVM called component_list.txt.
+    Then, there is one file per component that lists all files of the library in compile order. This file is called compile_order.txt. 
+
+    :param uvvm_path: absolute or relative path pointing to the UVVM source directory e.g. '../UVVM'
+    :param libraries: List of UVVM libraries that are used. If libraries is None, all UVVM libraries are added to VUnit
     """
 
-    for libname in used_libraries:
-        LIBuvvm = VU.add_library(libname)
-        LIBuvvm.add_source_files(UVVM_root_path / libname / "src" / "*.vhd")
-        if libname != "uvvm_vvc_framework" and libname != "uvvm_util" and libname != "bitvis_vip_scoreboard":
-            LIBuvvm.add_source_files(
-                UVVM_root_path / "uvvm_vvc_framework" / "src_target_dependent" / "*.vhd")
+    # load the list of available UVVM components
+    component_list_file = Path(uvvm_path) / "script" / "component_list.txt"
+    if not Path(component_list_file).exists():
+        raise ValueError(f"Found no file named '{component_list_file!s}'. Probably, the UVVM path is incorrect (uvvm_path={uvvm_path}).")
+
+    uvvm_components = []
+    with open(component_list_file) as f:
+        uvvm_components = [s.strip() for s in f.readlines()] # read all components from component_list.txt
+        uvvm_components = [s for s in uvvm_components if (not s.startswith("#")) and s] # remove comments and empty lines
+
+    if libraries != None:
+        # check if all given libraries are available in UVVM
+        if not all(libname in uvvm_components for libname in libraries):
+            raise ValueError(f"some requested libraries are not available in UVVM. Requested: {libraries}, Available UVVM Components: {uvvm_components}")
+        uvvm_components = libraries 
+
+    # add source files of the components
+    for component in uvvm_components:
+        lib = VU.add_library(component)
+
+        script_dir = Path(uvvm_path) / component / "script"
+        source_files = []
+        with open(script_dir / "compile_order.txt") as f:
+            source_files = [s.strip() for s in f.readlines()] # read all lines including comments
+            source_files = [s for s in source_files if (not s.startswith("#")) and s] # remove comments and empty lines
+            #add the full path to the list of source files
+            source_files = [os.path.abspath(script_dir / Path(s)) for s in source_files]
+
+        # add the files
+        lib.add_source_files(source_files)
 
 
 def add_precompiled_uvvm_libraries(VU, used_libraries, UVVM_root_path):
