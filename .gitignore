@@ -1,3 +1,4 @@
 /dist/
+/venv/
 src/VUnit_helpers.egg-info/
 src/__pycache__/

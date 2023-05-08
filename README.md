@@ -3,8 +3,20 @@
 This package contains project independent tools and helpers to simplify VUnit run scripts.
 Using this, the run script gets shorter, more readable and easier to maintain. 
 
-# Usage Examples
+# Installing VUnit_helpers
+You can install this package from source or via PyPi
 
+## Installing via PyPi
+
+    python -m pip install vunit_helpers
+
+## Installing from source:
+1. Clone or download the repository
+2. navigate to the directory and run ```python -m pip install .```
+
+Optionally add the ```-e``` flag to install the package in the editable mode.
+
+# Usage Examples
 
 ## Get the root path of a git repository
 Working with relative paths in VUnit is dangerouse, since it depends on the working directory of python during execution. Instead, you can use your git repository as the root reference of all paths.
