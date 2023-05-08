@@ -1,37 +1,40 @@
 [build-system]
-requires = ["setuptools>=61.0","vunit_hdl>=4.6.0", "toml>=0.10.2"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 
 [project]
+version = "2023.5.8"
 name = "VUnit-helpers"
-version = "0.0.1"
+description = "Common tools and helpers to simplify the VUnit run scripts"
 authors = [
   { name="Markus Leiter", email="leiter@p2l2.com" },
 ]
-description = "Common tools and helpers to simplify the VUnit run scripts"
+license = {file="LICENCE"}
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.7"
 classifiers = [
     "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
     "Natural Language :: English",
     "Intended Audience :: Developers",
-    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: POSIX :: Linux",
     "Topic :: Software Development :: Testing",
     "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
 ]
+keywords = ["VUnit", "unit testing"]
 dependencies = [
     "pathlib",
-    "subprocess",
-    "sys",
-    "os",
+    "logging",
+    "glob2",
+    "typing",
+    "toml>=0.10.2"
 ]
 
 [project.urls]
