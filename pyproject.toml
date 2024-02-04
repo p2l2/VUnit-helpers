@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 
 [project]
-version = "2023.5.7"
+version = "1.0.2"
 name = "VUnit-helpers"
 description = "Common tools and helpers to simplify the VUnit run scripts"
 authors = [
@@ -31,9 +31,7 @@ classifiers = [
 keywords = ["VUnit", "unit testing"]
 dependencies = [
     "pathlib",
-    "logging",
     "glob2",
-    "typing",
     "toml>=0.10.2"
 ]
 
