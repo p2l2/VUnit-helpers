@@ -70,7 +70,7 @@ def generate_rust_hdl_toml(VU, output_file, file_root_path):
             if os.path.isabs(file.name):
                 files.append(str(file.name))
             else:
-                files.append(str(Path(file_root_path) / file.name))
+                files.append(str(os.path.normpath(Path(file_root_path) / file.name)))
 
         vhdl_ls["libraries"].update(
             {
