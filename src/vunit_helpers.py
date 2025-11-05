@@ -46,7 +46,7 @@ def get_git_repo_root_path():
     return Path(git_repo_dir)
 
 
-def generate_rust_hdl_toml(VU, output_file, file_root_path):
+def generate_rust_hdl_toml(VU, output_file, file_root_path, third_party_libs=[]):
     """
     Generate the toml file required by rust_hdl (vhdl_ls).
 
@@ -75,7 +75,8 @@ def generate_rust_hdl_toml(VU, output_file, file_root_path):
         vhdl_ls["libraries"].update(
             {
                 lib.name: {
-                    "files": files
+                    "files": files,
+                    "is_third_party": lib.name in third_party_libs
                 }
             }
         )
