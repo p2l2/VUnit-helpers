@@ -50,7 +50,7 @@ vunit_helpers.add_precompiled_uvvm_libraries(VU,["uvvm_util", "uvvm_vvc_framewor
 ## Add a custom UVVM VVC to VUnit
 
 For custom verification components, that are not part of the UVVM repository, you
-can include them in your VUnit project. The VVC must be structured like a UVVM VVC, with a compile_order.txt file and the target dependent files of the VVC framework.
+can include them in your VUnit project. The VVC must be structured like a UVVM VVC, with a compile_order.txt file (including relative paths such as a real component inside UVVM would have) and the target dependent files of the VVC framework.
 
 Use vunit_helpers.add_uvvm_vvc_sources() to add such a VVC to VUnit:
 ``` Python
