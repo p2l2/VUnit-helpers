@@ -136,7 +136,6 @@ def add_uvvm_sources(VU,uvvm_path,libraries=None):
         # add the files
         lib.add_source_files(source_files)
 
-
 def add_precompiled_uvvm_libraries(VU, used_libraries, UVVM_root_path):
     """ 
     Add the passed UVVM libraries to VUnit. 
@@ -166,6 +165,58 @@ def add_precompiled_uvvm_libraries(VU, used_libraries, UVVM_root_path):
         logger.error(
             f"Adding precompiled UVVM libraries for simulator {VU.get_simulator_name()} is not supported. You can use add_uvvm_sources() instead")
 
+def add_uvvm_vvc_sources(VU, uvvm_path, vvc_paths=[]):
+    """
+    For components that are not part of UVVM, but use the UVVM VVC framework, this function can be 
+    used to add external VVCs (created with the VVC template script) to VUnit.
+    
+    Structure of the VVC folder is as follows:
+    [vvc_folder]
+    |-- [script]
+    |   |-- compile_order.txt
+    |-- [src]
+    |   |-- *.vhd
+
+    Usage example:
+    vunit_helpers.add_uvvm_vvc_sources(VU, uvvm_path="./UVVM", vvc_paths=["../src/vip_custom_vvc"])
+
+    Args:
+        VU: A VUnit object file.
+        uvvm_path: absolute or relative path pointing to the UVVM source directory e.g. '../UVVM'
+        vvc_paths: List of absolute or relative paths pointing to the VVC directories
+    """
+
+    for vvc_path in vvc_paths:
+        script_dir = Path(vvc_path) / "script"
+        compile_order_file = script_dir / "compile_order.txt"
+        if not compile_order_file.exists():
+            raise ValueError(f"Found no file named '{compile_order_file!s}'. Probably, the VVC path is incorrect (vvc_path={vvc_path}).")
+    
+        with open(compile_order_file) as f:
+            lines = [s.strip() for s in f.readlines()] # read all lines including comments
+    
+        # the library is named in the header, e.g. '# library vip_library_name'
+        try:
+            library_name = next(s.split()[2] for s in lines if s.startswith("# library "))
+        except Exception:
+            raise ValueError(f"Found no library name in the header of '{compile_order_file!s}'.") from None
+
+        source_files = []
+        for source_file in [s for s in lines if (not s.startswith("#")) and s]: # skip comments and empty lines
+            #add the full path to the list of source files
+            file_path = Path(os.path.abspath(script_dir / Path(source_file)))
+            if not file_path.exists():
+                # the file is no part of the VVC but of an UVVM component. Such paths are relative to
+                # the UVVM root, which is the parent directory of every VVC that is part of UVVM
+                file_path = Path(os.path.abspath(Path(uvvm_path) / os.path.relpath(file_path, os.path.abspath(Path(vvc_path).parent))))
+                if not file_path.exists():
+                    raise ValueError(f"Found no file named '{file_path!s}' which is listed in '{compile_order_file!s}'.")
+            source_files.append(str(file_path))
+    
+        # add the files
+        lib = VU.add_library(library_name)
+        lib.add_source_files(source_files)
+        logger.debug(f"added {len(source_files)} source files of the VVC {vvc_path!s} to the library {library_name}")
 
 def set_ghdl_flags_for_UVVM(VU):
     """ 
