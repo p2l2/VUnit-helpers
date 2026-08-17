@@ -47,6 +47,20 @@ VU = VUnit.from_argv()
 vunit_helpers.add_precompiled_uvvm_libraries(VU,["uvvm_util", "uvvm_vvc_framework", "bitvis_vip_scoreboard", "bitvis_vip_uart"],"path/to/UVVM")
 ```
 
+## Add a custom UVVM VVC to VUnit
+
+For custom verification components, that are not part of the UVVM repository, you
+can include them in your VUnit project. The VVC must be structured like a UVVM VVC, with a compile_order.txt file (including relative paths such as a real component inside UVVM would have) and the target dependent files of the VVC framework.
+
+Use vunit_helpers.add_uvvm_vvc_sources() to add such a VVC to VUnit:
+``` Python
+VU = VUnit.from_argv()
+vunit_helpers.add_uvvm_sources(VU, "<path to UVVM>")
+vunit_helpers.add_uvvm_vvc_sources(
+    VU, uvvm_path= "<path to UVVM>", 
+    vvc_paths=[git_repo_path / "src" / "vip_custom_vvc"]) # <- path to the VVC directory
+```
+
 ## Advanced add Source Files
 Vunit helpers allows including and excluding wildcard patterns. That way, it's easier to exclude specific files from VUnit. 
 ``` Python
