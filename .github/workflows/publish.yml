@@ -22,21 +22,34 @@ jobs:
         pip install
         build
         --user
-    - name: Build a binary wheel and a source tarball
+    - name: Build a dev-versioned wheel and source tarball for Test PyPI
       run: >-
         python -m
         build
+        .
         --sdist
         --wheel
-        --outdir dist/
-        .
+        --outdir dist-dev/
+        -C--global-option=egg_info
+        -C--global-option=--tag-build=.dev${{ github.run_number }}
 
     - name: Publish distribution 📦 to Test PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
         repository-url: https://test.pypi.org/legacy/
-        
+        packages-dir: dist-dev/
+
+    - name: Build a binary wheel and a source tarball
+      if: startsWith(github.ref, 'refs/tags')
+      run: >-
+        python -m
+        build
+        .
+        --sdist
+        --wheel
+        --outdir dist/
+
     - name: Publish distribution 📦 to PyPI
       if: startsWith(github.ref, 'refs/tags')
       uses: pypa/gh-action-pypi-publish@release/v1
