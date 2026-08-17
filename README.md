@@ -47,6 +47,19 @@ VU = VUnit.from_argv()
 vunit_helpers.add_precompiled_uvvm_libraries(VU,["uvvm_util", "uvvm_vvc_framework", "bitvis_vip_scoreboard", "bitvis_vip_uart"],"path/to/UVVM")
 ```
 
+### Custom adaptations package
+
+UVVM is configured through `uvvm_util/src/adaptations_pkg.vhd`. Instead of editing that file inside the UVVM checkout (which is usually a submodule), you can keep your own copy in your project and pass it via the `adaptations` argument. It replaces the file shipped with UVVM, so it must declare `package adaptations_pkg`:
+
+``` Python
+VU = VUnit.from_argv()
+vunit_helpers.add_uvvm_sources(
+    VU, git_repo_path / "UVVM",
+    adaptations=git_repo_path / "verification" / "adaptations_pkg.vhd")
+```
+
+The easiest way to create it is to copy `UVVM/uvvm_util/src/adaptations_pkg.vhd` into your project and edit the constants you need.
+
 ## Add a custom UVVM VVC to VUnit
 
 For custom verification components, that are not part of the UVVM repository, you
