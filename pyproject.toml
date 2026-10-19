@@ -30,7 +30,6 @@ classifiers = [
 ]
 keywords = ["VUnit", "unit testing"]
 dependencies = [
-    "pathlib",
     "glob2",
     "toml>=0.10.2"
 ]
