@@ -85,7 +85,7 @@ def generate_rust_hdl_toml(VU, output_file, file_root_path, third_party_libs=[])
     logger.debug(f"rust_hdl configuration was written to {output_file}")
 
 
-def add_uvvm_sources(VU,uvvm_path,libraries=None):
+def add_uvvm_sources(VU,uvvm_path,libraries=None, adaptations=None):
     """
     UVVM https://github.com/UVVM/UVVM is a free and Open Source Methodology and Library which can be used in combination with VUnit.
     Use add_uvvm to add the UVVM sources from a given path. 
@@ -103,7 +103,15 @@ def add_uvvm_sources(VU,uvvm_path,libraries=None):
 
     :param uvvm_path: absolute or relative path pointing to the UVVM source directory e.g. '../UVVM'
     :param libraries: List of UVVM libraries that are used. If libraries is None, all UVVM libraries are added to VUnit
+    :param adaptations: Path to a custom adaptations_pkg.vhd. It replaces uvvm_util/src/adaptations_pkg.vhd,
+                        so the file must declare 'package adaptations_pkg' (plus a package body, if it needs one).
     """
+
+    # validate the adaptations path before any other work is done
+    if adaptations != None:
+        adaptations = Path(adaptations).resolve()
+        if not adaptations.is_file():
+            raise ValueError(f"Found no file named '{adaptations!s}'. Probably, the adaptations path is incorrect (adaptations={adaptations}).")
 
     # load the list of available UVVM components
     component_list_file = Path(uvvm_path) / "script" / "component_list.txt"
@@ -132,6 +140,9 @@ def add_uvvm_sources(VU,uvvm_path,libraries=None):
             source_files = [s for s in source_files if (not s.startswith("#")) and s] # remove comments and empty lines
             #add the full path to the list of source files
             source_files = [os.path.abspath(script_dir / Path(s)) for s in source_files]
+
+        if adaptations != None:
+            source_files = [str(adaptations) if Path(s).name == "adaptations_pkg.vhd" else s for s in source_files]
 
         # add the files
         lib.add_source_files(source_files)
