@@ -10,11 +10,11 @@ description = "Common tools and helpers to simplify the VUnit run scripts"
 authors = [
   { name="Markus Leiter", email="leiter@p2l2.com" },
 ]
-license = {file="LICENCE"}
+license = "MPL-2.0"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.7"
 classifiers = [
-    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
     "Natural Language :: English",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3.7",
@@ -30,7 +30,6 @@ classifiers = [
 ]
 keywords = ["VUnit", "unit testing"]
 dependencies = [
-    "pathlib",
     "glob2",
     "toml>=0.10.2"
 ]
